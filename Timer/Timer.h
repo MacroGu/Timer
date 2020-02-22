@@ -8,9 +8,10 @@
 #include <stdint.h>
 #include "Singleton.h"
 
-enum TimerType {
-	ONCE,
-	CIRCLE
+// 定时器类型
+enum class eTimerType : uint8_t {
+	ONCE,			// 仅执行一次
+	CIRCLE			// 循环执行
 };
 
 class Timer {
@@ -19,38 +20,27 @@ public:
 	Timer();
 	~Timer();
 
-	template <typename Fun>
-	void Start(Fun fun, unsigned interval, TimerType timeType = CIRCLE);
 	void Stop();
 
-	void SetHeapIndex(const uint32_t& index) { heapIndex_ = index; }
-	uint32_t GetHeapIndex() { return heapIndex_; }
-	void SetExpires(const uint64_t& _expires) { expires_ = _expires; }
-	uint64_t GetExpires() { return expires_; }
-	uint32_t GetInterval() { return interval_; }
-	TimerType GetTimerType() { return timerType_; }
-
-	void OnTimer(uint64_t now);
+	void SetHeapIndex(const uint32_t& index) { heap_index = index; }
+	uint32_t GetHeapIndex() { return heap_index; }
+	void SetExpires(const uint64_t& _expires) { expire_time = _expires; }
+	uint64_t GetExpires() { return expire_time; }
+	void SetInterval(const uint32_t& _interval) { interval = _interval; }
+	uint32_t GetInterval() { return interval; }
+	void SetTimerType(const eTimerType& _timer_type) { timer_type = _timer_type; }
+	eTimerType GetTimerType() { return timer_type; }
+	// 设置回调函数
+	void SetCallBackFunc(const std::function<void(uint32_t)>& call_back);
+	// 时间达到回调   elapse：距离上次回调间隔
+	void OnTimer(uint32_t elapse);
 
 private:
-	TimerType timerType_;
-	std::function<void(void)> timerFun_;
-	uint32_t interval_;
-	uint64_t expires_;
-	uint32_t heapIndex_;
+	eTimerType timer_type;		//定时器类型
+	uint32_t interval;			//定时器回调间隔 
+	uint64_t expire_time;		//定时器失效时间
+	uint32_t heap_index;		//在堆中的index
+	std::function<void(uint32_t)> timer_call_back;		// 回调函数
+
 };
 
-
-
-template <typename Fun>
-inline void Timer::Start(Fun fun, uint32_t interval, TimerType timeType)
-{
-	Stop();
-	interval_ = interval;
-	timerFun_ = fun;
-	timerType_ = timeType;
-
-	auto time_now = std::chrono::system_clock::now();
-	auto duration_in_ms = std::chrono::duration_cast<std::chrono::milliseconds>(time_now.time_since_epoch());
-	this->expires_ = this->interval_ + duration_in_ms.count();
-}

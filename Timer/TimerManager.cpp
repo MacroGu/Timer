@@ -51,9 +51,10 @@ void TimerManager::DetectTimers()
 	while (!heap_.empty() && heap_[0].time <= duration_in_ms.count())
 	{
 		std::shared_ptr<Timer> timer = heap_[0].timer;
+		uint32_t elapse = duration_in_ms.count() + timer->GetInterval() - heap_[0].time;
 		RemoveTimer(timer);
 
-		if (timer->GetTimerType() == CIRCLE)
+		if (timer->GetTimerType() == eTimerType::CIRCLE)
 		{
 			timer->SetExpires(duration_in_ms.count() + timer->GetInterval());
 			AddTimer(timer);
@@ -63,7 +64,7 @@ void TimerManager::DetectTimers()
 			timer->SetHeapIndex(-1);
 		}
 
-		timer->OnTimer(duration_in_ms.count());
+		timer->OnTimer(elapse);
 	}
 }
 

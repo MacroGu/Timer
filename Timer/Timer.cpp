@@ -1,16 +1,13 @@
-#define _CRT_SECURE_NO_WARNINGS
 #include "Timer.h"
-#ifdef _MSC_VER
-# include <sys/timeb.h>
-#else
-# include <sys/time.h>
-#endif
 
 
 
-
-Timer::Timer() : heapIndex_(-1)
+Timer::Timer()
 {
+	heap_index = -1;
+	interval = 0;
+	expire_time = 0;
+	timer_type = eTimerType::ONCE;
 }
 
 Timer::~Timer()
@@ -20,16 +17,21 @@ Timer::~Timer()
 
 void Timer::Stop()
 {
-	if (heapIndex_ != -1) 
+	if (heap_index != -1) 
 	{
-		heapIndex_ = -1;
+		heap_index = -1;
 	}
 }
 
-void Timer::OnTimer(uint64_t now)
+void Timer::SetCallBackFunc(const std::function<void(uint32_t)>& call_back)
+{
+	timer_call_back = call_back;
+}
+
+void Timer::OnTimer(uint32_t elapse)
 {
 
-	timerFun_();
+	timer_call_back(elapse);
 
 }
 
