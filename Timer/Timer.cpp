@@ -23,15 +23,13 @@ void Timer::Stop()
 	}
 }
 
-void Timer::SetCallBackFunc(const std::function<void(uint32_t)>& call_back)
+void Timer::SetCallBackFunc(const std::function<void(uint64_t)>& call_back)
 {
 	timer_call_back = call_back;
 }
 
-void Timer::OnTimer(uint32_t elapse)
+void Timer::OnTimer(uint64_t elapse)
 {
-
 	timer_call_back(elapse);
-
 }
 

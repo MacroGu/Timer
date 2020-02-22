@@ -1,9 +1,10 @@
 #pragma  once
 
 #include <vector>
+#include <functional>
 #include <stdint.h>
 #include "Singleton.h"
-
+#include "Definition.h"
 
 class Timer;
 
@@ -24,9 +25,13 @@ struct stHeapEntry
 class TimerManager : public ISingleton<TimerManager>
 {
 public:
+	// 调用及分配timer
 	void DetectTimers();
+	// 部署一个 timer
+	uint32_t ScheduleTimer(const uint32_t& delay, const uint32_t& interval, const eTimerType& timer_type, const std::function<void(uint64_t)>& call_back);
 
-public:
+
+private:
 	void AddTimer(std::shared_ptr<Timer> timer);
 	void RemoveTimer(std::shared_ptr<Timer> timer);
 

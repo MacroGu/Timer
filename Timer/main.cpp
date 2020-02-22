@@ -11,21 +11,16 @@ void TimerHandler(uint32_t elapse)
 
 int main()
 {
-	std::shared_ptr<Timer> t(new Timer());
-	t->SetHeapIndex(-1);
-	t->SetCallBackFunc(TimerHandler);
-	t->SetInterval(1000);
-	t->SetTimerType(eTimerType::CIRCLE);
-	auto time_now = std::chrono::system_clock::now();
-	auto duration_in_ms = std::chrono::duration_cast<std::chrono::milliseconds>(time_now.time_since_epoch());
-	t->SetExpires(duration_in_ms.count() + t->GetInterval());
-
-	TimerManager::GetInstance().AddTimer(t);
+	// 添加逻辑处理定时器
+	TimerManager::GetInstance().ScheduleTimer(0, TIME_LENGTH_PER_FRAME, eTimerType::CIRCLE, TimerHandler);
+	TimerManager::GetInstance().ScheduleTimer(0, TIME_LENGTH_PER_SECONDS, eTimerType::CIRCLE, TimerHandler);
+	TimerManager::GetInstance().ScheduleTimer(0, TIME_LENGTH_PER_MINUTE, eTimerType::CIRCLE, TimerHandler);
+	TimerManager::GetInstance().ScheduleTimer(0, TIME_LENGTH_PER_HOUR, eTimerType::CIRCLE, TimerHandler);
 
 	while (true)
 	{
 		TimerManager::GetInstance().DetectTimers();
-		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+		//std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 	}
 
 	std::cin.get();

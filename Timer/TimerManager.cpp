@@ -51,7 +51,7 @@ void TimerManager::DetectTimers()
 	while (!heap_.empty() && heap_[0].time <= duration_in_ms.count())
 	{
 		std::shared_ptr<Timer> timer = heap_[0].timer;
-		uint32_t elapse = duration_in_ms.count() + timer->GetInterval() - heap_[0].time;
+		uint64_t elapse = duration_in_ms.count() + timer->GetInterval() - heap_[0].time;
 		RemoveTimer(timer);
 
 		if (timer->GetTimerType() == eTimerType::CIRCLE)
@@ -66,6 +66,18 @@ void TimerManager::DetectTimers()
 
 		timer->OnTimer(elapse);
 	}
+}
+
+uint32_t TimerManager::ScheduleTimer(const uint32_t& delay, const uint32_t& interval, const eTimerType& timer_type, const std::function<void(uint64_t)>& call_back)
+{
+	std::shared_ptr<Timer> t(new Timer());
+	t->SetCallBackFunc(call_back);
+	t->SetInterval(interval);
+	t->SetTimerType(timer_type);
+	t->SetExpires(delay + std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
+	AddTimer(t);
+	t->SetTimerID(t->GetHeapIndex());			// 初始的 heap index，保证唯一，但是会变化
+	return t->GetTimerID();
 }
 
 void TimerManager::UpHeap(uint32_t index)
@@ -102,5 +114,3 @@ void TimerManager::SwapHeap(uint32_t index1, uint32_t index2)
 	heap_[index1].timer->SetHeapIndex(index1);
 	heap_[index2].timer->SetHeapIndex(index2);
 }
-
-

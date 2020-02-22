@@ -7,12 +7,8 @@
 #include <vector>
 #include <stdint.h>
 #include "Singleton.h"
+#include "Definition.h"
 
-// 定时器类型
-enum class eTimerType : uint8_t {
-	ONCE,			// 仅执行一次
-	CIRCLE			// 循环执行
-};
 
 class Timer {
 public:
@@ -30,17 +26,20 @@ public:
 	uint32_t GetInterval() { return interval; }
 	void SetTimerType(const eTimerType& _timer_type) { timer_type = _timer_type; }
 	eTimerType GetTimerType() { return timer_type; }
+	void SetTimerID(const uint32_t& _id) { id = _id; }
+	uint32_t GetTimerID() { return id; }
 	// 设置回调函数
-	void SetCallBackFunc(const std::function<void(uint32_t)>& call_back);
+	void SetCallBackFunc(const std::function<void(uint64_t)>& call_back);
 	// 时间达到回调   elapse：距离上次回调间隔
-	void OnTimer(uint32_t elapse);
+	void OnTimer(uint64_t elapse);
 
 private:
 	eTimerType timer_type;		//定时器类型
 	uint32_t interval;			//定时器回调间隔 
 	uint64_t expire_time;		//定时器失效时间
 	uint32_t heap_index;		//在堆中的index
-	std::function<void(uint32_t)> timer_call_back;		// 回调函数
+	std::function<void(uint64_t)> timer_call_back;		// 回调函数
+	uint32_t id;				// 唯一ID
 
 };
 
